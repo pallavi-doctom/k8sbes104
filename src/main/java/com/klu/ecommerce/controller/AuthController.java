@@ -1,17 +1,32 @@
-import axios from "axios";
+package com.klu.ecommerce.controller;
 
-const API_URL = "http://localhost:30083/back1/auth";
+import com.klu.ecommerce.service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
-export const login = async (username, password) => {
-  const response = await axios.post(`${API_URL}/login`, { username, password });
-  localStorage.setItem("token", response.data);
-  return response.data;
-};
+@RestController
+@RequestMapping("/auth")
+@CrossOrigin
+public class AuthController {
+    private final UserService userService;
 
-export const signup = async (username, email, password) => {
-  return axios.post(`${API_URL}/signup`, { username, email, password });
-};
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
 
-export const logout = () => {
-  localStorage.removeItem("token");
-};
+    @PostMapping("/signup")
+    public ResponseEntity<String> registerUser(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String email = request.get("email");
+        String password = request.get("password");
+        return ResponseEntity.ok(userService.registerUser(username, email, password));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String password = request.get("password");
+        return ResponseEntity.ok(userService.loginUser(username, password));
+    }
+}
